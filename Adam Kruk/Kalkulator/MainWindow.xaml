@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Kalkulator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="500">
+        Title="Kalkulator" Height="500" Width="500">
     <Window.Resources>
         <Style x:Key="Symbols">
             <Setter Property="ItemsControl.Background" Value="#888"/>
@@ -107,8 +107,8 @@
             <Button Name="button_Delete"
                     Grid.Row="0"
                     Grid.Column="3"
-                    Content="C"
-                    Click="button_Delete_Click"
+                    Content="+/-"
+                    Click="button_plus_minus_Click"
                     Style="{StaticResource Symbols}"/>
             <Button Name="button_DeleteAll"
                     Grid.Row="0"

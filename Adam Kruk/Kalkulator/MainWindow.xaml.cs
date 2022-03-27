@@ -21,7 +21,6 @@ namespace Kalkulator
     public partial class MainWindow : Window
     {
         private List<string> items = new List<string>();
-        private List<string> symbols = new List<string>();
         public string decimalSeparator = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
         public MainWindow()
@@ -43,11 +42,15 @@ namespace Kalkulator
             }
         }
 
-        private void button_Delete_Click(object sender, RoutedEventArgs e)
+        private void button_plus_minus_Click(object sender, RoutedEventArgs e)
         {
-            if(!string.IsNullOrWhiteSpace(textBlock_screen.Text))
+            if (textBlock_screen.Text.Contains("-"))
             {
-                textBlock_screen.Text = textBlock_screen.Text.Remove(textBlock_screen.Text.Length - 1);
+                textBlock_screen.Text = textBlock_screen.Text.Remove(0, 1);
+            }
+            else
+            {
+                textBlock_screen.Text = $"-{textBlock_screen.Text}";
             }
         }
 
@@ -72,17 +75,25 @@ namespace Kalkulator
         {
             Button btn = sender as Button;
 
-            if (string.IsNullOrWhiteSpace(textBlock_screen.Text) && (string)btn?.Content == "-")
-            {
-                textBlock_screen.Text += btn?.Content;
-            }
-            else if (!string.IsNullOrWhiteSpace(textBlock_screen.Text))
+            if (!string.IsNullOrWhiteSpace(textBlock_screen.Text) && textBlock_screen.Text != "-")
             {
                 items.Add(textBlock_screen.Text);
-                symbols.Add((string)btn?.Content);
-
-                textBlock_screen.Text = textBlock_screen.Text.Remove(0);
             }
+
+            if (items.Count > 0)
+            {
+                if (items[items.Count - 1] == "-" || items[items.Count - 1] == "+" || items[items.Count - 1] == "x" || items[items.Count - 1] == "/")
+                {
+                    items[items.Count - 1] = (btn?.Content.ToString());
+                }
+                else
+                {
+                    items.Add(btn?.Content.ToString());
+                }
+            }
+
+            textBlock_screen.Text = string.Empty;
+
         }
 
         private void button_Solution_Click(object sender, RoutedEventArgs e)
@@ -90,7 +101,7 @@ namespace Kalkulator
             if (!string.IsNullOrWhiteSpace(textBlock_screen.Text))
             {
                 items.Add(textBlock_screen.Text);
-                symbols.Add("=");
+                items.Add("=");
             }
 
             if (items.Count > 0)
@@ -102,11 +113,13 @@ namespace Kalkulator
                 else
                 {
                     List<double> itemsNumeric = new List<double>();
+                    List<string> symbols = new List<string>();
 
-                    for (int i = 0; i < items.Count; i++)
+                    for (int i = 0; i < items.Count; i += 2)
                     {
                         double.TryParse(items[i], out double item);
                         itemsNumeric.Add(item);
+                        symbols.Add(items[i + 1]);
                     }
 
                     for (int i = 0; i < itemsNumeric.Count; i++)
@@ -119,6 +132,15 @@ namespace Kalkulator
                             }
                             else
                             {
+                                if (itemsNumeric[i + 1] == 0)
+                                {
+                                    MessageBox.Show("You can't divide by 0");
+                                    items.Clear();
+                                    itemsNumeric.Clear();
+                                    symbols.Clear();
+                                    textBlock_screen.Text = string.Empty;
+                                    return;
+                                }
                                 itemsNumeric[i] /= itemsNumeric[i + 1];
                             }
                             itemsNumeric.RemoveAt(i + 1);
